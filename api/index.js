@@ -4,10 +4,10 @@ const cors = require("cors");
 const port = process.env.PORT || 3001;
 const bcrypt = require("bcrypt-nodejs");
 
-const signin = require("./controllers/signin");
-const register = require("./controllers/register");
-const profile = require("./controllers/profile");
-const image = require("./controllers/image");
+const signin = require("../controllers/signin");
+const register = require("../controllers/register");
+const profile = require("../controllers/profile");
+const image = require("../controllers/image");
 
 const db = require("knex")({
   client: "pg",
