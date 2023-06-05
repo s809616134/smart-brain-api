@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const port = 3001;
+const port = process.env.PORT || 3001;
 const bcrypt = require("bcrypt-nodejs");
 
 const signin = require("./controllers/signin");
@@ -12,41 +12,19 @@ const image = require("./controllers/image");
 const db = require("knex")({
   client: "pg",
   connection: {
-    host: "127.0.0.1",
-    port: 5432, //postgres port NOT server port
-    user: "postgres",
-    password: "0verused",
-    database: "user",
+    host: process.env.POSTGRES_URL,
+    user: process.env.POSTGRES_USER,
+    password: process.env.POSTGRES_PASSWORD,
+    database: process.env.POSTGRES_DATABASE,
   },
 });
-
-const database = {
-  users: [
-    {
-      id: "123",
-      name: "John",
-      email: "john@gmail.com",
-      password: "cookies",
-      entries: 0,
-      joined: new Date(),
-    },
-    {
-      id: "124",
-      name: "Sally",
-      email: "sally@gmail.com",
-      password: "bananas",
-      entries: 0,
-      joined: new Date(),
-    },
-  ],
-};
 
 app.use(express.json()); // for parsing application/json
 app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 app.use(cors());
 //home
-app.get("/", (req, res) => {
-  res.send(database.users);
+app.get("/test", (req, res) => {
+  res.send("");
 });
 
 //signin
