@@ -4,16 +4,28 @@ const handleSignin = (db, bcrypt) => async (req, res) => {
     return res.status(400).json("invalid signin format");
   }
 
-  const user = await db.login.findUnique({
-    where: { email: email },
-  });
+  const loginUser = await db.login
+    .findUnique({
+      where: { email: email },
+    })
+    .catch(async (e) => {
+      res.status(400).json("unable to register");
+      await db.$disconnect();
+      process.exit(1);
+    });
 
-  const isValid = bcrypt.compareSync(password, user.hash);
-  if (!user || !isValid) {
+  const isValid = bcrypt.compareSync(password, loginUser.hash);
+  if (!loginUser || !isValid) {
     res.status(400).json("Invallid credentials");
-  }
+  } else {
+    const validUser = await db.users.findUnique({
+      where: {
+        email: email,
+      },
+    });
 
-  res.json(user);
+    res.json(validUser);
+  }
   // db.select("email", "hash")
   //   .from("login")
   //   .where("email", "=", email)
