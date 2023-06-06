@@ -2,7 +2,7 @@ const Clarifai = require("clarifai");
 
 // basic use of Clarifai
 const app = new Clarifai.App({
-  apiKey: "40d7504e73bf45928f9f5f985422af84",
+  apiKey: process.env.CLARIFAI_KEY,
 });
 
 const handleApiCall = (req, res) => {
@@ -12,17 +12,33 @@ const handleApiCall = (req, res) => {
     .catch((err) => res.status(400).json("unable to work with API"));
 };
 
-const handleUpdateImageEntries = (req, res, db) => {
+const handleUpdateImageEntries = async (req, res, db) => {
   const { id } = req.body;
-  db("users")
-    .where("id", "=", id)
-    .increment("entries", 1)
-    .returning("entries")
-    .then((entries) => {
-      //return a array of object[{entries: x}]
-      res.json(entries[0].entries);
+  const user = await db.users
+    .update({
+      where: { id: Number(id) },
+      data: {
+        entries: {
+          increment: 1,
+        },
+      },
     })
-    .catch((err) => res.status(400).json("unable to get entries"));
+    .catch(async (e) => {
+      res.status(400).json("unable to get entries");
+      await db.$disconnect();
+      process.exit(1);
+    });
+
+  res.json(user.entries);
+  // db("users")
+  //   .where("id", "=", id)
+  //   .increment("entries", 1)
+  //   .returning("entries")
+  //   .then((entries) => {
+  //     //return a array of object[{entries: x}]
+  //     res.json(entries[0].entries);
+  //   })
+  //   .catch((err) => res.status(400).json("unable to get entries"));
 };
 
 module.exports = {
